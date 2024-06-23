@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Post;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 
@@ -12,6 +13,7 @@ class StorePostRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        abort(403);
         return auth()->check() && Gate::allows('create', Post::class);
     }
 
