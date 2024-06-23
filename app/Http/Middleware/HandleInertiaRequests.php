@@ -4,6 +4,8 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -29,12 +31,22 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user,
             ],
             'greeting' => 'Hello World!',
+            'message' => collect(Arr::only($request->session()->all(),['success', 'error']))->mapWithKeys(function($body, $type){
+                return [
+                    'type' => $type,
+                    'body' => $body,
+                ];
+            }),
+            'can' => [
+                'post_create' => $user && $user->can('create',Post::class)
+            ],
         ];
     }
 }

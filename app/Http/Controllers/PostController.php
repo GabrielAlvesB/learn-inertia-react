@@ -12,6 +12,7 @@ class PostController extends Controller
 {
     public function index()
     {
+        // dd(auth()->user()->hasVerifiedEmail());
         $posts = Post::with('user')->latest()->get();
         $now = now();
         return Inertia::render('Posts/Index',[
@@ -23,11 +24,11 @@ class PostController extends Controller
     public function store(StorePostRequest $request)
     {
         // dd($request->validated());
-        sleep(3);
+        // sleep(3);
         // auth()->user()->posts()->create(
         //     $request -> validated()
         // ); 
 
-        return redirect()->route('posts.index');
+        return redirect()->route('posts.index')->with('success', 'Post created successfully');
     }
 }

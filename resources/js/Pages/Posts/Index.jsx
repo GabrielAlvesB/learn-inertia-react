@@ -1,20 +1,19 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, useForm, router, Link } from "@inertiajs/react";
-import toast from "react-hot-toast";
+import { Head, useForm, router, Link, usePage } from "@inertiajs/react";
 
 export default function Index({ auth, posts, now, greeting }) {
-    const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
+    const { data, setData, post, processing, errors, reset, clearErrors } = useForm("StorePost",{
         body: "",
     });
+
+    
+    const page = usePage();
 
     function submit(e) {
         e.preventDefault();
         post(route("posts.store"),{
             onSuccess: () =>{
                 reset('body')
-                toast.success('Post Created Successfully!',{
-                    position: "bottom-right"
-                })
             }
         });
     }
@@ -24,6 +23,7 @@ export default function Index({ auth, posts, now, greeting }) {
         router.visit(route('posts.index'),{
             only: ['posts'],
             preserveScroll: true,
+            preserveState: true,
         });
     }
 
@@ -44,7 +44,8 @@ export default function Index({ auth, posts, now, greeting }) {
                     {/* {errors.body} */}
                     {/* {now} */}
                     {/* {greeting} */}
-                    <form
+                    {page.props.can.post_create && (
+                        <form
                         onSubmit={submit}
                         className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6"
                     >
@@ -70,6 +71,8 @@ export default function Index({ auth, posts, now, greeting }) {
                             Post
                         </button>
                     </form>
+                    )}
+                    
                     <div className="py-3 flex justify-center">
                         <button 
                         onClick={refreshPosts}
