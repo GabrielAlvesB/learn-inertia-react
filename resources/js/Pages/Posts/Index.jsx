@@ -1,14 +1,30 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, useForm } from "@inertiajs/react";
+import { Head, useForm, router, Link } from "@inertiajs/react";
+import toast from "react-hot-toast";
 
-export default function Index({ auth, posts }) {
-    const { data, setData, post, processing, errors } = useForm({
+export default function Index({ auth, posts, now, greeting }) {
+    const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
         body: "",
     });
 
     function submit(e) {
         e.preventDefault();
-        post(route("posts.store"));
+        post(route("posts.store"),{
+            onSuccess: () =>{
+                reset('body')
+                toast.success('Post Created Successfully!',{
+                    position: "bottom-right"
+                })
+            }
+        });
+    }
+
+    function refreshPosts(){
+        console.log('refreshing posts')
+        router.visit(route('posts.index'),{
+            only: ['posts'],
+            preserveScroll: true,
+        });
     }
 
     return (
@@ -26,6 +42,8 @@ export default function Index({ auth, posts }) {
                 {/* {data.body} */}
                 <div className="max-w-3xl mx-auto sm:px-6 lg:px-8 space-y-3">
                     {/* {errors.body} */}
+                    {/* {now} */}
+                    {/* {greeting} */}
                     <form
                         onSubmit={submit}
                         className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6"
@@ -35,20 +53,41 @@ export default function Index({ auth, posts }) {
                         </label>
                         <textarea
                             onChange={(e) => setData("body", e.target.value)}
+                            onFocus={()=> clearErrors('body')}
                             name="body"
                             id="body"
                             cols="30"
                             rows="5"
+                            value={data.body}
                             className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full"
                         ></textarea>
                         {errors.body && <p className="text-red-500">{errors.body}</p>} 
                         <button
                             type="submit"
-                            className="mt-2 bg-gray-700 px-4 py-2 rounded-md font-medium"
+                            disabled={processing}
+                            className={`mt-2 bg-gray-700 px-4 py-2 rounded-md font-medium text-white ${processing && 'opacity-50'}`}
                         >
                             Post
                         </button>
                     </form>
+                    <div className="py-3 flex justify-center">
+                        <button 
+                        onClick={refreshPosts}
+                        className="text-sm text-indigo-700"
+                        type="button"
+                        >
+                            Refresh posts
+                        </button>
+                        <Link 
+                        href={route('posts.index')}
+                        only={['posts']}
+                        preserveScroll
+                        className="text-sm text-indigo-700"
+                        type="button"
+                        >
+                            Refresh posts 2
+                        </Link>
+                    </div>
 
                     {posts.data.map((post) => {
                         return (
