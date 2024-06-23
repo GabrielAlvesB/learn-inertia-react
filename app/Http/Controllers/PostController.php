@@ -25,9 +25,9 @@ class PostController extends Controller
     {
         // dd($request->validated());
         // sleep(3);
-        // auth()->user()->posts()->create(
-        //     $request -> validated()
-        // ); 
+        auth()->user()->posts()->create(
+            $request -> validated()
+        ); 
 
         return redirect()->route('posts.index')->with('success', 'Post created successfully');
     }
